@@ -13,12 +13,13 @@ import LoadingSpinner from '@components/common/LoadingSpinner/LoadingSpinner';
 import WrongCat from '@components/common/WrongCat/WrongCat';
 import useAddToCart from '@hooks/mutation/useAddToCart';
 import useCartItems from '@hooks/query/useCartItem';
-import useDecreaseCartItemQuantityByCartId from '@hooks/mutation/useDecreaseCartItemQuantity';
+import useChangeCartItemQuantity from '@hooks/mutation/useChangeCartItemQuantity';
 import useDeleteFromCart from '@hooks/mutation/useDeleteFromCart';
-import useIncreaseCartItemQuantity from '@hooks/mutation/useIncreaseCartItemQuantity';
 import useInfinityProducts from '@hooks/query/useInfinityProduct';
 import useIntersectionObserver from '@hooks/useIntersectionObserver';
 import { useToastContext } from '@components/common/Toast/provider/ToastProvider';
+
+// import useIncreaseCartItemQuantity from '@hooks/mutation/useIncreaseCartItemQuantity';
 
 const ProductPage = () => {
   const { showToast } = useToastContext();
@@ -50,11 +51,30 @@ const ProductPage = () => {
 
   const { mutate: addToCart } = useAddToCart({ errorHandler });
   const { mutate: deleteToCart } = useDeleteFromCart({ errorHandler });
-  const { mutate: increaseCartItemQuantity } = useIncreaseCartItemQuantity({
+  // const { mutate: increaseCartItemQuantity } = useIncreaseCartItemQuantity({
+  //   errorHandler,
+  // });
+  const { mutate: changeCartItemQuantity } = useChangeCartItemQuantity({
     errorHandler,
   });
-  const { mutate: decreaseCartItemQuantity } =
-    useDecreaseCartItemQuantityByCartId({ errorHandler });
+
+  const increaseCartItemQuantity = (cartItemId: number) => {
+    const cartItem = cartItems?.find(cartItem => cartItem.id === cartItemId);
+    if (!cartItem) return;
+    changeCartItemQuantity({
+      cartItemId: cartItemId,
+      quantity: cartItem.quantity + 1,
+    });
+  };
+
+  const decreaseCartItemQuantity = (cartItemId: number) => {
+    const cartItem = cartItems?.find(cartItem => cartItem.id === cartItemId);
+    if (!cartItem) return;
+    changeCartItemQuantity({
+      cartItemId: cartItemId,
+      quantity: Math.max(1, cartItem.quantity - 1),
+    });
+  };
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 

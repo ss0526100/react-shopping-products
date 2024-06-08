@@ -1,9 +1,7 @@
 import { useMutation, useQueryClient } from 'react-query';
 
-import ERROR_MESSAGE from '@constants/errorMessage';
-import HTTPError from '@errors/HTTPError';
+import END_POINTS from '@apis/EndPoints';
 import QUERY_KEYS from '@hooks/queryKeys';
-import { addProduct } from '@apis/ShoppingCartFetcher';
 
 interface Props {
   errorHandler: (err: unknown) => void;
@@ -11,20 +9,22 @@ interface Props {
 export default function useAddToCart({ errorHandler }: Props) {
   const queryClient = useQueryClient();
 
-  return useMutation(
-    async (id: number) => {
-      return addProduct(id).catch(error => {
-        if (!(error instanceof HTTPError))
-          throw new Error(ERROR_MESSAGE.clientNetwork);
-        if (500 <= error.statusCode) throw new Error(ERROR_MESSAGE.server);
-        if (400 <= error.statusCode) throw new Error(ERROR_MESSAGE.hadCartItem);
-      });
+  return useMutation({
+    mutationFn: (productId: number) =>
+      fetch(END_POINTS.cartItem, {
+        method: 'post',
+        body: JSON.stringify({
+          productId,
+          quantity: 1,
+        }),
+      }),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.cartItems] });
     },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.cartItems] });
-      },
-      onError: errorHandler,
-    }
-  );
+    onError: (err: unknown) => {
+      console.log(err);
+      errorHandler(err);
+    },
+  });
 }

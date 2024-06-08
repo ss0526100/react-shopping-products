@@ -1,5 +1,14 @@
 import { Category, SortType } from '@pages/ProductPage/Product.types';
 
+const ROOT_URL = import.meta.env.VITE_API_URL;
+
+export interface FetchProductsParam {
+  page?: number;
+  size?: number;
+  sortType?: SortType;
+  category?: Category;
+}
+
 const SORT_TYPE_MATCHER: Record<SortType, string> = {
   '낮은 가격순': 'asc',
   '높은 가격순': 'desc',
@@ -14,13 +23,6 @@ const CATEGORY_MATCHER: Record<Category, string> = {
   피트니스: 'fitness',
   도서: 'books',
 };
-
-interface FetchProductsParam {
-  page?: number;
-  size?: number;
-  sortType?: SortType;
-  category?: Category;
-}
 
 export const getProductEndpoint = ({
   page,
@@ -39,5 +41,13 @@ export const getProductEndpoint = ({
   if (sortType !== undefined)
     params.append('sort', `price,${SORT_TYPE_MATCHER[sortType]}`);
 
-  return `products?${params.toString()}`;
+  return `${ROOT_URL}/products?${params.toString()}`;
 };
+
+const END_POINTS = {
+  getProductEndpoint,
+  product: `${ROOT_URL}/products`,
+  cartItem: `${ROOT_URL}/cart-item`,
+};
+
+export default END_POINTS;
