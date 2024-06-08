@@ -425,6 +425,8 @@ var P0=Object.defineProperty;var O0=(e,t,n)=>t in e?P0(e,t,{enumerable:!0,config
     opacity: 0;
   }
 `,gv=I.div`
+  font-size: 15px;
+
   background-color: red;
   color: white;
   width: ${$r.layoutWidth};
